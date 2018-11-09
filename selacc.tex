@@ -5,6 +5,11 @@
 
 \newcommand{\dd}{\mathrm{d}}
 \newcommand{\diff}[2]{\frac{\dd #1}{\dd #2}}
+\newcommand{\Ndraw}{N_\mathrm{draw}}
+\newcommand{\Ndet}{N_\mathrm{det}}
+\newcommand{\Neff}{N_\mathrm{eff}}
+\newcommand{\Nobs}{N_\mathrm{obs}}
+\newcommand{\pdraw}{p_\mathrm{draw}}
 
 \begin{document}
 
@@ -18,10 +23,10 @@
 
 \maketitle
 
-When conducting a population analysis on a dataset consisting of measurements
-$d_i$, $i = 1, \ldots, N$, subject to some selection function that constrain the
-parameters $\theta_i$ of a set of $N$ objects to infer the population
-distribution
+When conducting a population analysis on a catalog consisting of measurements
+$d_i$, $i = 1, \ldots, \Nobs$, subject to some selection function that constrain
+the parameters $\theta_i$ of a set of $N$ objects to infer the population
+distribution function
 %
 \begin{equation}
   \diff{N}{\theta}\left( \lambda \right),
@@ -32,17 +37,150 @@ posterior for the object-level parameters $\theta_i$ and population-level
 parameters takes the form \citep{Loredo2004,Mandel2018}
 %
 \begin{equation}
-\pi \propto \prod_{i=1}^N \left[ p\left( d_i \mid \theta_i \right) \diff{N}{\theta_i}\left( \lambda \right) \right] \exp\left[ - \Lambda\left( \lambda \right) \right].
+  \label{eq:posterior}
+\pi \propto \prod_{i=1}^{\Nobs} \left[ p\left( d_i \mid \theta_i \right) \diff{N}{\theta_i}\left( \lambda \right) \right] \exp\left[ - \Lambda\left( \lambda \right) \right] p\left( \lambda \right).
 \end{equation}
 %
 Here $p\left( d \mid \theta\right)$ is the likelihood function that describes
-the measurement process of each system and $\Lambda$ is the expected number of
+the measurement process of each system, $p\left( \lambda \right)$ is a prior on
+the population-level parameters, and $\Lambda$ is the expected number of
 detections given the measurement process and selection effects, here assumed to
 depend only on the observed data for each object:
+%
 \begin{equation}
+  \label{eq:selection-integral-unnorm}
   \Lambda\left( \lambda \right) \equiv \int_{\left\{ d \mid f(d) > 0 \right\}} \dd d \, \dd \theta \, \diff{N}{\theta}\left( \lambda \right) p\left( d \mid \theta \right),
 \end{equation}
-where $f$ is the selection function, such that an object will be included in the observed sample if and only if it generates data such that $f(d) > 0$.
+%
+where $f$ is the selection function, such that an object will be included in the
+observed sample if and only if it generates data such that $f(d) > 0$.  It will
+be convenient to factor an overall normalization out of the population
+distribution so that
+%
+\begin{equation}
+  \diff{N}{\theta}\left( \lambda \right) = R \xi\left( \theta \mid \tilde{\lambda} \right),
+\end{equation}
+%
+with the amplitude of $\xi$ fixed in some way (perhaps by demanding that $\xi$
+integrate to one over all $\theta$, or fixing its value at a fiducial set of
+parameters); here $\tilde{\lambda}$ is the set of parameters that remain once
+the amplitude of the population distribution is fixed.  In this
+re-parameterization, $\Lambda = R x$, where $x$ is given by
+%
+\begin{equation}
+  \label{eq:selection-integral}
+  x\left( \tilde{\lambda} \right) \equiv \int_{\left\{ d \mid f(d) > 0 \right\}} \dd d \, \dd \theta \, \xi\left( \theta \mid \tilde{\lambda} \right) p\left( d \mid \theta \right).
+\end{equation}
+%
+If $\xi$ integrates to one over all $\theta$, then $x$ is the \emph{fraction} of
+sources from a population described by $\tilde{\lambda}$ that are detectable.
+
+In simple cases the integral in Eq.\ \eqref{eq:selection-integral} can be
+evaluated analytically.  In other cases it is not possible to evaluate the
+integral analytically, but $f$ is a simple enough function to permit evaluation
+of the integral stochastically in the process of sampling from $\pi$
+\citep{Mandel2018}.  But for most realistic applications it is not even possible
+to analytically evaluate $f$ \citep[see
+e.g.][]{Burke2015,Christainsen2015,GW150914-Rate,GW150914-Rate-Supplement,Burke2017}.
+Instead, the detection efficiency must be \emph{simulated} by drawing synthetic
+objects from a fiducial distribution, $\pdraw\left( \theta \right)$, drawing
+corresponding data from the likelihood function $p\left( d \mid \theta \right)$,
+and ``injecting'' these data into the pipeline used to produce the catalog,
+recording which are detected.  This Monte-Carlo procedure introduces uncertainty
+in the estimation of the selection integral; we must have enough draws that this
+uncertainty does not alter the shape of the posterior $\pi$ very much.
+
+Given a set of detected objects with parameters $\theta_j$, $j = 1, \ldots,
+\Ndet$, generated from a total number of draws $\Ndraw$ the integral in Eq.\
+\eqref{eq:selection-integral} can be estimated via
+%
+\begin{equation}
+  x \simeq \frac{1}{\Ndraw} \sum_{j=1}^{\Ndet} \frac{\xi\left( \theta_j \mid \tilde{\lambda} \right)}{\pdraw\left( \theta_j \right)}.
+\end{equation}
+%
+In fact, under repeated samplings and assuming a large number of effective draws
+(see below) $x$ will follow an approximately log-normal distribution
+%
+\begin{equation}
+    \log x \sim N\left( \mu, \sigma \right),
+\end{equation}
+%
+with
+%
+\begin{equation}
+  \exp\left[\mu\right] \simeq \frac{1}{\Ndraw} \sum_{j=1}^{\Ndet} \frac{\xi\left( \theta_j \mid \tilde{\lambda} \right)}{\pdraw\left( \theta_j \right)} ,
+\end{equation}
+%
+and
+%
+\begin{equation}
+    \sigma^2 \equiv \frac{1}{\Neff} \simeq \frac{\exp[-2\mu]}{\Ndraw^2} \sum_{i=1}^{\Ndet} \left[ \frac{\xi\left( \theta_j \mid \tilde{\lambda} \right)}{\pdraw\left( \theta_j \right)} \right]^2 - \frac{1}{\Ndraw},
+\end{equation}
+%
+where we have introduced the parameter $\Neff$ that gives the \emph{effective}
+number of independent samples that contribute to the Monte-Carlo estimate of
+$x$.
+
+Given a particular sampling of the selection function, we should marginalize
+over the uncertainty in $x$ in our posterior.  It will be convenient to choose a
+flat-in-log prior on $R$, so that $p(R) \propto R^{-1}$
+\citep{Fishbach2018,Mandel2018}.  Then Eq.\ \eqref{eq:posterior} becomes
+%
+\begin{equation}
+  \label{eq:posterior-integrated}
+    \pi \propto \prod_{i = 1}^{\Nobs} \left[ p\left( d_i \mid \theta_i \right) \xi\left( \theta_i \mid \tilde{\lambda} \right) \right] \int \dd x \, R^{\Nobs - 1} \exp\left[ -R x \right] \frac{N\left( \log x \mid \mu, \sigma\right)}{x}.
+\end{equation}
+%
+The posterior can be simultaneously marginalized over $x$ and $R$, to obtain a
+marginal posterior, $\bar{\pi}$, for parameters $\theta_i$ and $\tilde{\lambda}$
+that is
+%
+\begin{equation}
+  \log \bar{\pi} = \sum_{i = 1}^{\Nobs} \log \left[ p\left( d_i \mid \theta_i \right) \xi\left( \theta_i \mid \tilde{\lambda} \right) \right] - \Nobs \mu + \frac{\Nobs^2}{2 \Neff} + \mathrm{const}.
+\end{equation}
+%
+The $-\Nobs\mu$ term corresponds to the normalization of $\Nobs$ likelihood
+terms over \emph{selected} systems \citep{Mandel2018} assuming the selection
+integral is known perfectly, while the $\Nobs^2/2\Neff$ term comes from the
+Monte-Carlo uncertainty in the estimate of the integral.  At first glance, this
+latter term might seem problematic unless $\Neff \ll \Nobs^2$ which, since
+$\Neff = \mathcal{O}\left( \Ndraw \right)$, would imply that accurate parameter
+estimates would require a quadratically-increasing number of draws for the
+Monte-Carlo estimate of the selection integral.  However, only
+\emph{differences} in $\log \bar{\pi}$ matter for inferences on parameters, and
+these scale as
+%
+\begin{equation}
+    \Delta \log \bar{\pi} \simeq \ldots + \frac{\Nobs^2}{2\Neff^2} \frac{\partial \Neff}{\partial \tilde{\lambda}} \Delta \tilde{\lambda},
+\end{equation}
+%
+which will be small provided $\Neff \ll \Nobs$.  We emphasize that this
+condition can be straightforwardly tracked during, e.g., a MCMC stochastic
+sampling of the posterior; if it is ever violated, then more samples are
+necessary to estimate the selection integral for reliable parameter estimates.
+
+If we wish to estimate the normalization $R$ in addition to the shape of the
+population distribution, then we need to account for the shape of the integrand
+in Eq.\ \eqref{eq:posterior-integrated}.  For sufficiently large $\Neff$ and
+$\Nobs$, the integrand can be approximated as a Gaussian with a peak at $x =
+\exp\left[ \mu - \Nobs/\Neff \right]$ and $R = \left( \Nobs - 1 \right)/x$ with
+a covariance matrix given, to leading order, by
+%
+\begin{equation}
+  \Sigma = \begin{pmatrix} \Sigma_{RR} & \Sigma_{Rx} \\ \Sigma_{xR} & \Sigma_{xx} \end{pmatrix} = \begin{pmatrix} \exp\left[ - 2 \mu \right] \frac{\left(\Nobs - 1 \right)\Neff + 1 - 4 \Nobs + 3 \Nobs^2}{\Neff} & \frac{1 - \Nobs}{\Neff} \\ \frac{1-\Nobs}{\Neff} & \frac{\exp\left[ 2 \mu \right]}{\Neff} \end{pmatrix}.
+\end{equation}
+%
+Thus the uncertainty on $R$ after marginalizing over $x$ will be $\sigma_R =
+\sqrt{\Sigma_{RR}}$.  For reliable estimation of $R$, this uncertainty should
+not be significantly larger than the uncertainty assuming the selection integral
+is known perfectly, which is $\sigma_R / R \simeq 1/\sqrt{\Nobs}$.  Therefore,
+for accurate estimation of the normalization of the population distribution, we
+require $3\Nobs^2/\Neff \ll \Nobs - 1$ or $\Neff \gg \Nobs$.
+
+In short, for reliable estimates of the shape or normalization of the population
+distribution we require only $\mathcal{O}\left( \Nobs \right)$ draws from a
+fiducial population to obtain a Monte-Carlo estimate of the selection integral
+with $\Neff \gg \Nobs$.
 
 \bibliography{selacc}
 
