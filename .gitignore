@@ -4,3 +4,6 @@
 *.log
 selacc.pdf
 *.synctex.gz
+*.bib
+*.bbl
+*.blg

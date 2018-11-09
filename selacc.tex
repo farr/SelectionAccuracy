@@ -3,6 +3,9 @@
 \usepackage{amsmath}
 \usepackage{amssymb}
 
+\newcommand{\dd}{\mathrm{d}}
+\newcommand{\diff}[2]{\frac{\dd #1}{\dd #2}}
+
 \begin{document}
 
 \title{Accuracy Requirements for Empirically-Measured Selection Functions}
@@ -15,6 +18,32 @@
 
 \maketitle
 
+When conducting a population analysis on a dataset consisting of measurements
+$d_i$, $i = 1, \ldots, N$, subject to some selection function that constrain the
+parameters $\theta_i$ of a set of $N$ objects to infer the population
+distribution
+%
+\begin{equation}
+  \diff{N}{\theta}\left( \lambda \right),
+\end{equation}
+%
+which can depend on some population-level parameters $\lambda$, the joint
+posterior for the object-level parameters $\theta_i$ and population-level
+parameters takes the form \citep{Loredo2004,Mandel2018}
+%
+\begin{equation}
+\pi \propto \prod_{i=1}^N \left[ p\left( d_i \mid \theta_i \right) \diff{N}{\theta_i}\left( \lambda \right) \right] \exp\left[ - \Lambda\left( \lambda \right) \right].
+\end{equation}
+%
+Here $p\left( d \mid \theta\right)$ is the likelihood function that describes
+the measurement process of each system and $\Lambda$ is the expected number of
+detections given the measurement process and selection effects, here assumed to
+depend only on the observed data for each object:
+\begin{equation}
+  \Lambda\left( \lambda \right) \equiv \int_{\left\{ d \mid f(d) > 0 \right\}} \dd d \, \dd \theta \, \diff{N}{\theta}\left( \lambda \right) p\left( d \mid \theta \right),
+\end{equation}
+where $f$ is the selection function, such that an object will be included in the observed sample if and only if it generates data such that $f(d) > 0$.
 
+\bibliography{selacc}
 
 \end{document}
