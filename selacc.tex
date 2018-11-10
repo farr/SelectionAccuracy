@@ -5,6 +5,7 @@
 
 \newcommand{\dd}{\mathrm{d}}
 \newcommand{\diff}[2]{\frac{\dd #1}{\dd #2}}
+\newcommand{\fixme}[1]{\textcolor{red}{#1}}
 \newcommand{\Ndraw}{N_\mathrm{draw}}
 \newcommand{\Ndet}{N_\mathrm{det}}
 \newcommand{\Neff}{N_\mathrm{eff}}
@@ -142,13 +143,14 @@ that is
 The $-\Nobs\mu$ term corresponds to the normalization of $\Nobs$ likelihood
 terms over \emph{selected} systems \citep{Mandel2018} assuming the selection
 integral is known perfectly, while the $\Nobs^2/2\Neff$ term comes from the
-Monte-Carlo uncertainty in the estimate of the integral.  At first glance, this
-latter term might seem problematic unless $\Neff \ll \Nobs^2$ which, since
-$\Neff = \mathcal{O}\left( \Ndraw \right)$, would imply that accurate parameter
-estimates would require a quadratically-increasing number of draws for the
-Monte-Carlo estimate of the selection integral.  However, only
-\emph{differences} in $\log \bar{\pi}$ matter for inferences on parameters, and
-these scale as
+Monte-Carlo uncertainty in the estimate of the integral.  \fixme{This is not
+correct.  The scaling is more complicated, since it also depends on the accuracy
+in $\Delta \tilde{\lambda}$.}  At first glance, this latter term might seem
+problematic unless $\Neff \ll \Nobs^2$ which, since $\Neff = \mathcal{O}\left(
+\Ndraw \right)$, would imply that accurate parameter estimates would require a
+quadratically-increasing number of draws for the Monte-Carlo estimate of the
+selection integral.  However, only \emph{differences} in $\log \bar{\pi}$ matter
+for inferences on parameters, and these scale as
 %
 \begin{equation}
     \Delta \log \bar{\pi} \simeq \ldots + \frac{\Nobs^2}{2\Neff^2} \frac{\partial \Neff}{\partial \tilde{\lambda}} \Delta \tilde{\lambda},
