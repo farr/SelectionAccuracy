@@ -143,23 +143,28 @@ that is
 The $-\Nobs\mu$ term corresponds to the normalization of $\Nobs$ likelihood
 terms over \emph{selected} systems \citep{Mandel2018} assuming the selection
 integral is known perfectly, while the $\Nobs^2/2\Neff$ term comes from the
-Monte-Carlo uncertainty in the estimate of the integral.  \fixme{This is not
-correct.  The scaling is more complicated, since it also depends on the accuracy
-in $\Delta \tilde{\lambda}$.}  At first glance, this latter term might seem
-problematic unless $\Neff \ll \Nobs^2$ which, since $\Neff = \mathcal{O}\left(
-\Ndraw \right)$, would imply that accurate parameter estimates would require a
-quadratically-increasing number of draws for the Monte-Carlo estimate of the
-selection integral.  However, only \emph{differences} in $\log \bar{\pi}$ matter
-for inferences on parameters, and these scale as
+Monte-Carlo uncertainty in the estimate of the integral.  At first glance, this
+latter term might seem problematic unless $\Neff \ll \Nobs^2$ which, since
+$\Neff = \mathcal{O}\left( \Ndraw \right)$, would imply that accurate parameter
+estimates would require a quadratically-increasing number of draws for the
+Monte-Carlo estimate of the selection integral.  However, only
+\emph{differences} in $\log \bar{\pi}$ matter for inferences on parameters, and
+these scale as
 %
 \begin{equation}
-    \Delta \log \bar{\pi} \simeq \ldots + \frac{\Nobs^2}{2\Neff^2} \frac{\partial \Neff}{\partial \tilde{\lambda}} \Delta \tilde{\lambda},
+    \Delta \log \bar{\pi} \simeq \ldots + \frac{\Nobs^2}{2\Neff^2} \frac{\partial \Neff}{\partial \tilde{\lambda}} \Delta \tilde{\lambda}.
 \end{equation}
 %
-which will be small provided $\Neff \ll \Nobs$.  We emphasize that this
-condition can be straightforwardly tracked during, e.g., a MCMC stochastic
-sampling of the posterior; if it is ever violated, then more samples are
-necessary to estimate the selection integral for reliable parameter estimates.
+The above scales, in the limit of large $\Nobs$ and $\Neff$, as
+%
+\begin{equation}
+    \frac{\Nobs^2}{2\Neff^2} \frac{\partial \Neff}{\partial \tilde{\lambda}} \Delta \tilde{\lambda} \sim \frac{\Nobs^{3/2}}{\Neff} \frac{\partial \log \Neff}{\partial \tilde{\lambda}}.
+\end{equation}
+%
+We emphasize that this condition can be straightforwardly tracked during, e.g.,
+a MCMC stochastic sampling of the posterior; if it is ever violated, then more
+samples are necessary to estimate the selection integral for reliable parameter
+estimates.
 
 If we wish to estimate the normalization $R$ in addition to the shape of the
 population distribution, then we need to account for the shape of the integrand
