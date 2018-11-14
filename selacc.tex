@@ -24,16 +24,20 @@
 
 \maketitle
 
-When conducting a population analysis on a catalog consisting of measurements
-$d_i$, $i = 1, \ldots, \Nobs$, subject to some selection function that constrain
-the parameters $\theta_i$ of a set of $N$ objects to infer the population
-distribution function
+When conducting a population analysis on a catalog of objects the effect of the
+selection function---the choice of which observations produce objects that
+appear in the catalog and which do not---must be determined to sufficient
+accuracy to avoid so-called ``Malmquist bias''
+\citep{Malmquist1922,Loredo2004,Mandel2018}. Suppose we have a catalog
+consisting of measurements (data) $d_i$, $i = 1, \ldots, \Nobs$, that constrain
+the parameters $\theta_i$ of a set of $\Nobs$ objects.  We wish to use this
+catalog to infer the population distribution function
 %
 \begin{equation}
   \diff{N}{\theta}\left( \lambda \right),
 \end{equation}
 %
-which can depend on some population-level parameters $\lambda$, the joint
+which can depend on some population-level parameters $\lambda$.  The joint
 posterior for the object-level parameters $\theta_i$ and population-level
 parameters takes the form \citep{Loredo2004,Mandel2018}
 %
@@ -43,20 +47,20 @@ parameters takes the form \citep{Loredo2004,Mandel2018}
 \end{equation}
 %
 Here $p\left( d \mid \theta\right)$ is the likelihood function that describes
-the measurement process of each system, $p\left( \lambda \right)$ is a prior on
+the measurement process for the catalog, $p\left( \lambda \right)$ is a prior on
 the population-level parameters, and $\Lambda$ is the expected number of
 detections given the measurement process and selection effects, here assumed to
 depend only on the observed data for each object:
 %
 \begin{equation}
   \label{eq:selection-integral-unnorm}
-  \Lambda\left( \lambda \right) \equiv \int_{\left\{ d \mid f(d) > 0 \right\}} \dd d \, \dd \theta \, \diff{N}{\theta}\left( \lambda \right) p\left( d \mid \theta \right),
+  \Lambda\left( \lambda \right) \equiv \int_{\left\{ d \mid f(d) > 0 \right\}} \dd d \, \dd \theta \, \diff{N}{\theta}\left( \lambda \right) p\left( d \mid \theta \right).
 \end{equation}
 %
-where $f$ is the selection function, such that an object will be included in the
-observed sample if and only if it generates data such that $f(d) > 0$.  It will
-be convenient to factor an overall normalization out of the population
-distribution so that
+Here $f$ is the selection function, such that an observation will be included in
+the catalog if and only if it generates data such that $f(d) > 0$.  It will be
+convenient to factor an overall normalization out of the population distribution
+so that
 %
 \begin{equation}
   \diff{N}{\theta}\left( \lambda \right) = R \xi\left( \theta \mid \tilde{\lambda} \right),
@@ -64,9 +68,9 @@ distribution so that
 %
 with the amplitude of $\xi$ fixed in some way (perhaps by demanding that $\xi$
 integrate to one over all $\theta$, or fixing its value at a fiducial set of
-parameters); here $\tilde{\lambda}$ is the set of parameters that remain once
-the amplitude of the population distribution is fixed.  In this
-re-parameterization, $\Lambda = R x$, where $x$ is given by
+parameters); $\tilde{\lambda}$ is the set of parameters that remain once the
+amplitude of the population distribution is fixed.  In this re-parameterization,
+$\Lambda = R x$, where $x$ is given by
 %
 \begin{equation}
   \label{eq:selection-integral}
@@ -87,9 +91,10 @@ Instead, the detection efficiency must be \emph{simulated} by drawing synthetic
 objects from a fiducial distribution, $\pdraw\left( \theta \right)$, drawing
 corresponding data from the likelihood function $p\left( d \mid \theta \right)$,
 and ``injecting'' these data into the pipeline used to produce the catalog,
-recording which are detected.  This Monte-Carlo procedure introduces uncertainty
-in the estimation of the selection integral; we must have enough draws that this
-uncertainty does not alter the shape of the posterior $\pi$ very much.
+recording which observations are detected.  This Monte-Carlo procedure
+introduces uncertainty in the estimation of the selection integral; we must have
+enough draws that this uncertainty does not alter the shape of the posterior
+$\pi$ very much.
 
 Given a set of detected objects with parameters $\theta_j$, $j = 1, \ldots,
 \Ndet$, generated from a total number of draws $\Ndraw$ the integral in Eq.\
@@ -100,7 +105,13 @@ Given a set of detected objects with parameters $\theta_j$, $j = 1, \ldots,
 \end{equation}
 %
 In fact, under repeated samplings and assuming a large number of effective draws
-(see below) $x$ will follow an approximately log-normal distribution
+(see below) $x$ will follow an approximately log-normal
+distribution\footnote{The law of large numbers would suggest that $x$ follows a
+Gaussian distribution.  Here we use a log-normal because $x$ cannot follow a
+Gaussian in detail ($x > 0$ with probability 1), explicitly incorporating $x >
+0$ eliminates an artificial divergence as $x \to 0$, and in the asymptotic
+regime (which is what we are concerned with in this note) the behavior of the
+two distributions is identical.}
 %
 \begin{equation}
     \log x \sim N\left( \mu, \sigma \right),
@@ -119,8 +130,8 @@ and
 \end{equation}
 %
 where we have introduced the parameter $\Neff$ that gives the \emph{effective}
-number of independent samples that contribute to the Monte-Carlo estimate of
-$x$.
+number of independent samples (draws) that contribute to the Monte-Carlo
+estimate of $x$.
 
 Given a particular sampling of the selection function, we should marginalize
 over the uncertainty in $x$ in our posterior.  It will be convenient to choose a
@@ -146,48 +157,64 @@ integral is known perfectly, while the $\Nobs^2/2\Neff$ term comes from the
 Monte-Carlo uncertainty in the estimate of the integral.  At first glance, this
 latter term might seem problematic unless $\Neff \ll \Nobs^2$ which, since
 $\Neff = \mathcal{O}\left( \Ndraw \right)$, would imply that accurate parameter
-estimates would require a quadratically-increasing number of draws for the
-Monte-Carlo estimate of the selection integral.  However, only
-\emph{differences} in $\log \bar{\pi}$ matter for inferences on parameters, and
-these scale as
+estimates for large catalogs would require a quadratically-increasing number of
+draws for the Monte-Carlo estimate of the selection integral\footnote{A simple
+argument suggests that a quadratic scaling must be incorrect: for a quadratic
+scaling it would be more computationally efficient to break the observed catalog
+in half and fit the first half (using $1/4$ as many samples to evaluate the
+selection integral), using the results of the fit as the prior for a fit of the
+second half (with, again, $1/4$ as many samples).  But, statistically, this
+procedure is equivalent to fitting the full catalog: if $d_1$ and $d_2$ are the
+halves of the full data set, we have $p\left( d_1, d_2 \mid
+\tilde{\lambda}\right) = p\left( d_1 \mid d_2, \tilde{\lambda}\right) p\left(
+d_2 \mid \tilde{\lambda} \right)$.  If the scaling were quadratic, splitting
+would be asymptotically more efficient in the number of draws from the selection
+function while returning statistically identical estimates.}.  However, only
+\emph{differences} in $\log \bar{\pi}$ that depend on $\tilde{\lambda}$ matter
+for inferences on parameters, and these scale as
 %
 \begin{equation}
-    \Delta \log \bar{\pi} \simeq \ldots + \frac{\Nobs^2}{2\Neff^2} \frac{\partial \Neff}{\partial \tilde{\lambda}} \Delta \tilde{\lambda}.
+  \label{eq:pi-accuracy}
+    \Delta \log \bar{\pi} \simeq \ldots + \left( \Nobs \frac{\partial \mu}{\partial \tilde{\lambda}} + \frac{\Nobs^2}{2\Neff} \frac{\partial \log \Neff}{\partial \tilde{\lambda}} \right) \Delta \tilde{\lambda}.
 \end{equation}
 %
-The above scales, in the limit of large $\Nobs$ and $\Neff$, as
+We must draw enough samples in the Monte-Carlo selection estimate that the
+second term in parenthesis is sub-dominant.  Since both partial derivatives are
+independent of $\Neff$, we have
 %
 \begin{equation}
-    \frac{\Nobs^2}{2\Neff^2} \frac{\partial \Neff}{\partial \tilde{\lambda}} \Delta \tilde{\lambda} \sim \frac{\Nobs^{3/2}}{\Neff} \frac{\partial \log \Neff}{\partial \tilde{\lambda}}.
+    \Neff \gtrsim A \frac{\Nobs}{2},
 \end{equation}
 %
-We emphasize that this condition can be straightforwardly tracked during, e.g.,
-a MCMC stochastic sampling of the posterior; if it is ever violated, then more
-samples are necessary to estimate the selection integral for reliable parameter
-estimates.
+where the coefficient $A$ depends on the ratio of derivative terms above but is
+typically $\mathcal{O}(1)$.  The contribution of the two terms in Eq.\
+\eqref{eq:pi-accuracy} can be straightforwardly tracked during, e.g., a MCMC
+stochastic sampling of the posterior by comparing the posterior standard
+deviation of $\Nobs \mu$ to that of $\Nobs^2/2\Neff$; if the latter is not
+sub-dominant, then more samples are necessary to estimate the selection integral
+for reliable parameter estimates.
 
 If we wish to estimate the normalization $R$ in addition to the shape of the
 population distribution, then we need to account for the shape of the integrand
 in Eq.\ \eqref{eq:posterior-integrated}.  For sufficiently large $\Neff$ and
 $\Nobs$, the integrand can be approximated as a Gaussian with a peak at $x =
-\exp\left[ \mu - \Nobs/\Neff \right]$ and $R = \left( \Nobs - 1 \right)/x$ with
-a covariance matrix given, to leading order, by
+\exp\left[ \mu - \Nobs/\Neff \right]$ and $R = \left( \Nobs - 1 \right)/x$ and a
+covariance matrix given, to leading order, by
 %
 \begin{equation}
   \Sigma = \begin{pmatrix} \Sigma_{RR} & \Sigma_{Rx} \\ \Sigma_{xR} & \Sigma_{xx} \end{pmatrix} = \begin{pmatrix} \exp\left[ - 2 \mu \right] \frac{\left(\Nobs - 1 \right)\Neff + 1 - 4 \Nobs + 3 \Nobs^2}{\Neff} & \frac{1 - \Nobs}{\Neff} \\ \frac{1-\Nobs}{\Neff} & \frac{\exp\left[ 2 \mu \right]}{\Neff} \end{pmatrix}.
 \end{equation}
 %
-Thus the uncertainty on $R$ after marginalizing over $x$ will be $\sigma_R =
-\sqrt{\Sigma_{RR}}$.  For reliable estimation of $R$, this uncertainty should
-not be significantly larger than the uncertainty assuming the selection integral
-is known perfectly, which is $\sigma_R / R \simeq 1/\sqrt{\Nobs}$.  Therefore,
-for accurate estimation of the normalization of the population distribution, we
-require $3\Nobs^2/\Neff \ll \Nobs - 1$ or $\Neff \gg \Nobs$.
-
-In short, for reliable estimates of the shape or normalization of the population
-distribution we require only $\mathcal{O}\left( \Nobs \right)$ draws from a
-fiducial population to obtain a Monte-Carlo estimate of the selection integral
-with $\Neff \gg \Nobs$.
+We see that the fractional bias in $x$ (and therefore also $R$) is
+$\mathcal{O}\left( \Nobs / \Neff \right)$.  The uncertainty on $R$ after
+marginalizing over $x$ will be $\sigma_R = \sqrt{\Sigma_{RR}}$.  For reliable
+estimation of $R$, this uncertainty should not be significantly larger than the
+uncertainty assuming the selection integral is known perfectly, which is
+$\sigma_R / R \simeq 1/\sqrt{\Nobs}$.  Therefore, for accurate estimation of the
+normalization of the population distribution, we require $3\Nobs^2/\Neff \ll
+\Nobs - 1$ or $\Neff \gg \Nobs$.  As before, it is straightforward to track the
+fractional bias and increase in uncertainty in $R$ during stochastic sampling to
+ensure the desired accuracy.
 
 \bibliography{selacc}
 
