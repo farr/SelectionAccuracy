@@ -101,32 +101,27 @@ Given a set of detected objects with parameters $\theta_j$, $j = 1, \ldots,
 \eqref{eq:selection-integral} can be estimated via
 %
 \begin{equation}
+  \label{eq:simple-monte-carlo-estimate}
   x \simeq \frac{1}{\Ndraw} \sum_{j=1}^{\Ndet} \frac{\xi\left( \theta_j \mid \tilde{\lambda} \right)}{\pdraw\left( \theta_j \right)}.
 \end{equation}
 %
-In fact, under repeated samplings and assuming a large number of effective draws
-(see below) $x$ will follow an approximately log-normal
-distribution\footnote{The law of large numbers would suggest that $x$ follows a
-Gaussian distribution.  Here we use a log-normal because $x$ cannot follow a
-Gaussian in detail ($x > 0$ with probability 1), explicitly incorporating $x >
-0$ eliminates an artificial divergence as $x \to 0$, and in the asymptotic
-regime (which is what we are concerned with in this note) the behavior of the
-two distributions is identical.}
+In fact, under repeated samplings assuming finite variance of the ratio in the
+sum above $x$ will follow an approximately normal distribution
 %
 \begin{equation}
-    \log x \sim N\left( \mu, \sigma \right),
+    x \sim N\left( \mu, \sigma \right),
 \end{equation}
 %
 with
 %
 \begin{equation}
-  \exp\left[\mu\right] \simeq \frac{1}{\Ndraw} \sum_{j=1}^{\Ndet} \frac{\xi\left( \theta_j \mid \tilde{\lambda} \right)}{\pdraw\left( \theta_j \right)} ,
+  \mu \simeq \frac{1}{\Ndraw} \sum_{j=1}^{\Ndet} \frac{\xi\left( \theta_j \mid \tilde{\lambda} \right)}{\pdraw\left( \theta_j \right)} ,
 \end{equation}
 %
 and
 %
 \begin{equation}
-    \sigma^2 \equiv \frac{1}{\Neff} \simeq \frac{\exp[-2\mu]}{\Ndraw^2} \sum_{i=1}^{\Ndet} \left[ \frac{\xi\left( \theta_j \mid \tilde{\lambda} \right)}{\pdraw\left( \theta_j \right)} \right]^2 - \frac{1}{\Ndraw},
+    \sigma^2 \equiv \frac{\mu^2}{\Neff} \simeq \frac{1}{\Ndraw^2} \sum_{i=1}^{\Ndet} \left[ \frac{\xi\left( \theta_j \mid \tilde{\lambda} \right)}{\pdraw\left( \theta_j \right)} \right]^2 - \frac{\mu^2}{\Ndraw},
 \end{equation}
 %
 where we have introduced the parameter $\Neff$ that gives the \emph{effective}
@@ -134,87 +129,103 @@ number of independent samples (draws) that contribute to the Monte-Carlo
 estimate of $x$.
 
 Given a particular sampling of the selection function, we should marginalize
-over the uncertainty in $x$ in our posterior.  It will be convenient to choose a
-flat-in-log prior on $R$, so that $p(R) \propto R^{-1}$
-\citep{Fishbach2018,Mandel2018}.  Then Eq.\ \eqref{eq:posterior} becomes
+over the uncertainty in $x$ in our posterior.  Eq.\ \eqref{eq:posterior} becomes
 %
 \begin{equation}
   \label{eq:posterior-integrated}
-    \pi \propto \prod_{i = 1}^{\Nobs} \left[ p\left( d_i \mid \theta_i \right) \xi\left( \theta_i \mid \tilde{\lambda} \right) \right] \int \dd x \, R^{\Nobs - 1} \exp\left[ -R x \right] \frac{N\left( \log x \mid \mu, \sigma\right)}{x}.
+    \pi \propto \prod_{i = 1}^{\Nobs} \left[ p\left( d_i \mid \theta_i \right) \xi\left( \theta_i \mid \tilde{\lambda} \right) \right] \int \dd x \, R^{\Nobs} \exp\left[ -R x \right] \frac{N\left( \log x \mid \mu, \sigma\right)}{x}.
 \end{equation}
 %
-The posterior can be simultaneously marginalized over $x$ and $R$, to obtain a
-marginal posterior, $\bar{\pi}$, for parameters $\theta_i$ and $\tilde{\lambda}$
-that is
+Performing the integral and assuming that the $\Neff$ is large enough that the
+support of the normal distribution for $x<0$ is negligible so that we can
+integrate over $-\infty < x < \infty$, we obtain
 %
 \begin{equation}
-  \log \bar{\pi} = \sum_{i = 1}^{\Nobs} \log \left[ p\left( d_i \mid \theta_i \right) \xi\left( \theta_i \mid \tilde{\lambda} \right) \right] - \Nobs \mu + \frac{\Nobs^2}{2 \Neff} + \mathrm{const}.
+  \label{eq:approx-marginal-x-posterior}
+  \pi \propto \prod_{i = 1}^{\Nobs} \left[ p\left( d_i \mid \theta_i \right) \xi\left( \theta_i \mid \tilde{\lambda} \right) \right] R^{\Nobs} \exp\left[  \frac{R \mu \left( R\mu - 2 \Neff \right)}{2 \Neff} \right].
 \end{equation}
 %
-The $-\Nobs\mu$ term corresponds to the normalization of $\Nobs$ likelihood
-terms over \emph{selected} systems \citep{Mandel2018} assuming the selection
-integral is known perfectly, while the $\Nobs^2/2\Neff$ term comes from the
-Monte-Carlo uncertainty in the estimate of the integral.  At first glance, this
-latter term might seem problematic unless $\Neff \ll \Nobs^2$ which, since
-$\Neff = \mathcal{O}\left( \Ndraw \right)$, would imply that accurate parameter
-estimates for large catalogs would require a quadratically-increasing number of
-draws for the Monte-Carlo estimate of the selection integral\footnote{A simple
-argument suggests that a quadratic scaling must be incorrect: for a quadratic
-scaling it would be more computationally efficient to break the observed catalog
-in half and fit the first half (using $1/4$ as many samples to evaluate the
-selection integral), using the results of the fit as the prior for a fit of the
-second half (with, again, $1/4$ as many samples).  But, statistically, this
-procedure is equivalent to fitting the full catalog: if $d_1$ and $d_2$ are the
-halves of the full data set, we have $p\left( d_1, d_2 \mid
-\tilde{\lambda}\right) = p\left( d_1 \mid d_2, \tilde{\lambda}\right) p\left(
-d_2 \mid \tilde{\lambda} \right)$.  If the scaling were quadratic, splitting
-would be asymptotically more efficient in the number of draws from the selection
-function while returning statistically identical estimates.}.  However, only
-\emph{differences} in $\log \bar{\pi}$ that depend on $\tilde{\lambda}$ matter
-for inferences on parameters, and these scale as
+The divergence of this expression as $R\to \infty$ reflects that the normal
+approximation to the sampling distribution of $x$ at finite $\Neff$ permits
+non-zero probability of $x < 0$, while the true distribution requires $x > 0$;
+the central limit theorem only requires convergence in distribution to a normal
+as $\Neff \to \infty$.  Eq.\ \eqref{eq:approx-marginal-x-posterior} has
+stationary points in $R$ at
+%
+\begin{equation}
+  R = R_{\pm} = \frac{\Neff \pm \sqrt{\Neff \left( \Neff - 4 \Nobs \right)}}{2 \mu}.
+\end{equation}
+%
+Provided $\Neff > 4 \Nobs$ these stationary points will occur for real, positive
+$R$.  In this case, the stationary point at $R_{-}$ is a local maximum; at
+$R_{+}$ a minimum associated with the ``unphysical'' transition to the divergent
+behavior as $R\to \infty$.  We have
+%
+\begin{equation}
+  R_{-} = \frac{\Nobs}{\mu} \left( 1 + \frac{\Nobs}{\Neff} + 2 \left( \frac{\Nobs}{\Neff} \right)^2 + \mathcal{O}\left( \frac{\Nobs}{\Neff} \right)^3 \right).
+\end{equation}
+%
+Note that $R = \Nobs / \mu$ is the ``naive'' estimate one would obtain using the
+point estimate for the detection efficiency in Eq.\
+\eqref{eq:simple-monte-carlo-estimate}.  Near $R = R_{-}$ a normal approximation
+holds for the posterior as a function of $R$ with $\mu_R = R_{-}$ and
+%
+\begin{equation}
+  \sigma_R = \frac{\sqrt{\Nobs}}{\mu} \left( 1 + \frac{3}{2} \frac{\Nobs}{\Neff} + \frac{31}{8} \left( \frac{\Nobs}{\Neff} \right)^2 + \mathcal{O} \left( \frac{\Nobs}{\Neff} \right)^3 \right).
+\end{equation}
+%
+Marginalizing the normal approximation over $R$ yields
+%
+\begin{equation}
+  \log \pi \propto \sum_{i=1}^{\Nobs} \log p\left( d_i \mid \theta_i \right) \xi\left( \theta_i \mid \tilde{\lambda} \right) - \left( \Nobs + 1 \right) \log \mu + \frac{3 \Nobs + \Nobs^2}{2 \Neff} + \mathcal{O} \left( \Neff \right)^{-2}.
+\end{equation}
+%
+Had we imposed a flat-in-log (i.e.\ scale-free) prior on $R$, we would instead
+obtain
+%
+\begin{equation}
+  \label{eq:fully-marginalized-posterior}
+  \log \pi \propto \sum_{i=1}^{\Nobs} \log p\left( d_i \mid \theta_i \right) \xi\left( \theta_i \mid \tilde{\lambda} \right) - \Nobs \log \mu + \frac{3 \Nobs + \Nobs^2}{2 \Neff} + \mathcal{O} \left( \Neff \right)^{-2}.
+\end{equation}
+%
+The term involving $\mu$ is what we would naively estimate for the appropriate
+normalization in an analysis that ignores the rate $R$ and works entirely with
+population \emph{distributions} rather than \emph{number densities}
+\citep{Mandel2018,Fishbach2018}; the term involving $\Neff$ is a correction to
+account for the sampling uncertainty in our Monte-Carlo estimate of the
+selection integral.
+
+While the term in Eq.\ \eqref{eq:fully-marginalized-posterior} involving $\Neff$
+might at first seem troubling (as it is $\mathcal{O} \left( \Nobs^2 / \Neff
+\right)$, and therefore will not be negligable until $\Neff \gg \Nobs^2$,
+requiring a number of Monte-Carlo samples in the selection integral that grows
+faster than linearly with the number of observations fit), only
+\emph{differences} in log-posterior matter for inferences.  The $R$-dependent
+terms contribute to such differences through
 %
 \begin{equation}
   \label{eq:pi-accuracy}
-    \Delta \log \bar{\pi} \simeq \ldots + \left( \Nobs \frac{\partial \mu}{\partial \tilde{\lambda}} + \frac{\Nobs^2}{2\Neff} \frac{\partial \log \Neff}{\partial \tilde{\lambda}} \right) \Delta \tilde{\lambda}.
+  \Delta \log \pi = \ldots + \left( \Nobs \frac{\partial \mu}{\partial \tilde{\lambda}} - \frac{\Nobs^2}{2 \Neff} \frac{\partial \log \Neff}{\partial \tilde{\lambda}} \right) \Delta \tilde{\lambda}.
 \end{equation}
 %
-We must draw enough samples in the Monte-Carlo selection estimate that the
-second term in parenthesis is sub-dominant.  Since both partial derivatives are
-independent of $\Neff$, we have
-%
-\begin{equation}
-    \Neff \gtrsim A \frac{\Nobs}{2},
-\end{equation}
-%
-where the coefficient $A$ depends on the ratio of derivative terms above but is
-typically $\mathcal{O}(1)$.  The contribution of the two terms in Eq.\
-\eqref{eq:pi-accuracy} can be straightforwardly tracked during, e.g., a MCMC
-stochastic sampling of the posterior by comparing the posterior standard
-deviation of $\Nobs \mu$ to that of $\Nobs^2/2\Neff$; if the latter is not
-sub-dominant, then more samples are necessary to estimate the selection integral
-for reliable parameter estimates.
+Both derivatives are independent of $\Neff$, so the relative contribution of the
+second term to the parameter estimates is $\mathcal{O}\left( \Nobs / \Neff
+\right)$.  Thus we conclude that we can limit the effect of uncertainties in the
+Monte-Carlo selection estimate on population inferences using a number of
+samples that grows linearly with the number of observations being fit.
+
+The contribution of the two terms in Eq.\ \eqref{eq:pi-accuracy} can be
+straightforwardly tracked during, e.g., a MCMC stochastic sampling of the
+posterior by comparing the posterior standard deviation of $\Nobs \mu$ to that
+of $\Nobs^2/2\Neff$; if the latter is not sub-dominant, then more samples are
+necessary to estimate the selection integral for reliable parameter estimates
+(but remember that, at minimum, we require $\Neff > 4 \Nobs$ or our normal
+approximations to the posterior are invalid).
 
 If we wish to estimate the normalization $R$ in addition to the shape of the
-population distribution, then we need to account for the shape of the integrand
-in Eq.\ \eqref{eq:posterior-integrated}.  For sufficiently large $\Neff$ and
-$\Nobs$, the integrand can be approximated as a Gaussian with a peak at $x =
-\exp\left[ \mu - \Nobs/\Neff \right]$ and $R = \left( \Nobs - 1 \right)/x$ and a
-covariance matrix given, to leading order, by
-%
-\begin{equation}
-  \Sigma = \begin{pmatrix} \Sigma_{RR} & \Sigma_{Rx} \\ \Sigma_{xR} & \Sigma_{xx} \end{pmatrix} = \begin{pmatrix} \exp\left[ - 2 \mu \right] \frac{\left(\Nobs - 1 \right)\Neff + 1 - 4 \Nobs + 3 \Nobs^2}{\Neff} & \frac{1 - \Nobs}{\Neff} \\ \frac{1-\Nobs}{\Neff} & \frac{\exp\left[ 2 \mu \right]}{\Neff} \end{pmatrix}.
-\end{equation}
-%
-We see that the fractional bias in $x$ (and therefore also $R$) is
-$\mathcal{O}\left( \Nobs / \Neff \right)$.  The uncertainty on $R$ after
-marginalizing over $x$ will be $\sigma_R = \sqrt{\Sigma_{RR}}$.  For reliable
-estimation of $R$, this uncertainty should not be significantly larger than the
-uncertainty assuming the selection integral is known perfectly, which is
-$\sigma_R / R \simeq 1/\sqrt{\Nobs}$.  Therefore, for accurate estimation of the
-normalization of the population distribution, we require $3\Nobs^2/\Neff \ll
-\Nobs - 1$ or $\Neff \gg \Nobs$.  As before, it is straightforward to track the
-fractional bias and increase in uncertainty in $R$ during stochastic sampling to
-ensure the desired accuracy.
+population distribution, then we can draw samples from the normal conditional
+distribution for $R$ with mean $\mu_R$ and standard deviation $\sigma_R$ at
+fixed $\tilde{\lambda}$ in post-processing after fitting for $\tilde{\lambda}$.
 
 \bibliography{selacc}
 
