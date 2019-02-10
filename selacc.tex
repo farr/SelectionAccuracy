@@ -26,12 +26,11 @@
 
 When conducting a population analysis on a catalog of objects the effect of the
 selection function---the choice of which observations produce objects that
-appear in the catalog and which do not---must be determined to sufficient
-accuracy to avoid so-called ``Malmquist bias''
-\citep{Malmquist1922,Loredo2004,Mandel2018}. Suppose we have a catalog
-consisting of measurements (data) $d_i$, $i = 1, \ldots, \Nobs$, that constrain
-the parameters $\theta_i$ of a set of $\Nobs$ objects.  We wish to use this
-catalog to infer the population distribution function
+appear in the catalog and which do not---must be incorporated to avoid so-called
+``Malmquist bias'' \citep{Malmquist1922,Loredo2004,Mandel2018}. Suppose we have
+a catalog consisting of measurements (data) $d_i$, $i = 1, \ldots, \Nobs$, that
+constrain the parameters $\theta_i$ of a set of $\Nobs$ objects.  We wish infer
+the population distribution function
 %
 \begin{equation}
   \diff{N}{\theta}\left( \lambda \right),
@@ -49,15 +48,15 @@ parameters takes the form \citep{Loredo2004,Mandel2018}
 Here $p\left( d \mid \theta\right)$ is the likelihood function that describes
 the measurement process for the catalog, $p\left( \lambda \right)$ is a prior on
 the population-level parameters, and $\Lambda$ is the expected number of
-detections given the measurement process and selection effects, here assumed to
-depend only on the observed data for each object:
+detections given the measurement process and selection effects, the latter
+depending only on the observed data for each object:
 %
 \begin{equation}
   \label{eq:selection-integral-unnorm}
   \Lambda\left( \lambda \right) \equiv \int_{\left\{ d \mid f(d) > 0 \right\}} \dd d \, \dd \theta \, \diff{N}{\theta}\left( \lambda \right) p\left( d \mid \theta \right).
 \end{equation}
 %
-Here $f$ is the selection function, such that an observation will be included in
+The selection function is described by $f$; an observation will be included in
 the catalog if and only if it generates data such that $f(d) > 0$.  It will be
 convenient to factor an overall normalization out of the population distribution
 so that
@@ -91,10 +90,10 @@ Instead, the detection efficiency must be \emph{simulated} by drawing synthetic
 objects from a fiducial distribution, $\pdraw\left( \theta \right)$, drawing
 corresponding data from the likelihood function $p\left( d \mid \theta \right)$,
 and ``injecting'' these data into the pipeline used to produce the catalog,
-recording which observations are detected.  This Monte-Carlo procedure
-introduces uncertainty in the estimation of the selection integral; we must have
-enough draws that this uncertainty does not alter the shape of the posterior
-$\pi$ very much.
+recording which observations are detected \citep{Tiwari2018}.  This Monte-Carlo
+procedure introduces uncertainty in the estimation of the selection integral; we
+must have enough draws that this uncertainty does not alter the shape of the
+posterior $\pi$ very much.
 
 Given a set of detected objects with parameters $\theta_j$, $j = 1, \ldots,
 \Ndet$, generated from a total number of draws $\Ndraw$ the integral in Eq.\
@@ -105,8 +104,7 @@ Given a set of detected objects with parameters $\theta_j$, $j = 1, \ldots,
   x \simeq \frac{1}{\Ndraw} \sum_{j=1}^{\Ndet} \frac{\xi\left( \theta_j \mid \tilde{\lambda} \right)}{\pdraw\left( \theta_j \right)}.
 \end{equation}
 %
-In fact, under repeated samplings assuming finite variance of the ratio in the
-sum above $x$ will follow an approximately normal distribution
+Under repeated samplings $x$ will follow an approximately normal distribution
 %
 \begin{equation}
     x \sim N\left( \mu, \sigma \right),
@@ -133,7 +131,7 @@ over the uncertainty in $x$ in our posterior.  Eq.\ \eqref{eq:posterior} becomes
 %
 \begin{equation}
   \label{eq:posterior-integrated}
-    \pi \propto \prod_{i = 1}^{\Nobs} \left[ p\left( d_i \mid \theta_i \right) \xi\left( \theta_i \mid \tilde{\lambda} \right) \right] \int \dd x \, R^{\Nobs} \exp\left[ -R x \right] \frac{N\left( \log x \mid \mu, \sigma\right)}{x}.
+    \pi \propto \prod_{i = 1}^{\Nobs} \left[ p\left( d_i \mid \theta_i \right) \xi\left( \theta_i \mid \tilde{\lambda} \right) \right] \int \dd x \, R^{\Nobs} \exp\left[ -R x \right] N\left( x \mid \mu, \sigma\right).
 \end{equation}
 %
 Performing the integral and assuming that the $\Neff$ is large enough that the
@@ -147,10 +145,8 @@ integrate over $-\infty < x < \infty$, we obtain
 %
 The divergence of this expression as $R\to \infty$ reflects that the normal
 approximation to the sampling distribution of $x$ at finite $\Neff$ permits
-non-zero probability of $x < 0$, while the true distribution requires $x > 0$;
-the central limit theorem only requires convergence in distribution to a normal
-as $\Neff \to \infty$.  Eq.\ \eqref{eq:approx-marginal-x-posterior} has
-stationary points in $R$ at
+non-zero probability of $x < 0$, while the true distribution requires $x > 0$.
+Eq.\ \eqref{eq:approx-marginal-x-posterior} has stationary points in $R$ at
 %
 \begin{equation}
   R = R_{\pm} = \frac{\Neff \pm \sqrt{\Neff \left( \Neff - 4 \Nobs \right)}}{2 \mu}.
@@ -158,74 +154,61 @@ stationary points in $R$ at
 %
 Provided $\Neff > 4 \Nobs$ these stationary points will occur for real, positive
 $R$.  In this case, the stationary point at $R_{-}$ is a local maximum; at
-$R_{+}$ a minimum associated with the ``unphysical'' transition to the divergent
-behavior as $R\to \infty$.  We have
+$R_{+}$ we have a minimum associated with the ``unphysical'' transition to the
+divergent behavior as $R\to \infty$.  We have
 %
 \begin{equation}
   R_{-} = \frac{\Nobs}{\mu} \left( 1 + \frac{\Nobs}{\Neff} + 2 \left( \frac{\Nobs}{\Neff} \right)^2 + \mathcal{O}\left( \frac{\Nobs}{\Neff} \right)^3 \right).
 \end{equation}
 %
-Note that $R = \Nobs / \mu$ is the ``naive'' estimate one would obtain using the
-point estimate for the detection efficiency in Eq.\
-\eqref{eq:simple-monte-carlo-estimate}.  Near $R = R_{-}$ a normal approximation
-holds for the posterior as a function of $R$ with $\mu_R = R_{-}$ and
+Note that $R = \Nobs / \mu$ is the point estimate for the detection efficiency
+in Eq.\ \eqref{eq:simple-monte-carlo-estimate}.  Near $R = R_{-}$ a normal
+approximation holds for the posterior as a function of $R$ with $\mu_R = R_{-}$
+and
 %
 \begin{equation}
   \sigma_R = \frac{\sqrt{\Nobs}}{\mu} \left( 1 + \frac{3}{2} \frac{\Nobs}{\Neff} + \frac{31}{8} \left( \frac{\Nobs}{\Neff} \right)^2 + \mathcal{O} \left( \frac{\Nobs}{\Neff} \right)^3 \right).
 \end{equation}
 %
-Marginalizing the normal approximation over $R$ yields
-%
-\begin{equation}
-  \log \pi \propto \sum_{i=1}^{\Nobs} \log p\left( d_i \mid \theta_i \right) \xi\left( \theta_i \mid \tilde{\lambda} \right) - \left( \Nobs + 1 \right) \log \mu + \frac{3 \Nobs + \Nobs^2}{2 \Neff} + \mathcal{O} \left( \Neff \right)^{-2}.
-\end{equation}
-%
-Had we imposed a flat-in-log (i.e.\ scale-free) prior on $R$, we would instead
-obtain
+Marginalizing the normal approximation over $R$ imposing a flat-in-log $R$ prior
+gives
 %
 \begin{equation}
   \label{eq:fully-marginalized-posterior}
   \log \pi \propto \sum_{i=1}^{\Nobs} \log p\left( d_i \mid \theta_i \right) \xi\left( \theta_i \mid \tilde{\lambda} \right) - \Nobs \log \mu + \frac{3 \Nobs + \Nobs^2}{2 \Neff} + \mathcal{O} \left( \Neff \right)^{-2}.
 \end{equation}
 %
-The term involving $\mu$ is what we would naively estimate for the appropriate
-normalization in an analysis that ignores the rate $R$ and works entirely with
-population \emph{distributions} rather than \emph{number densities}
-\citep{Mandel2018,Fishbach2018}; the term involving $\Neff$ is a correction to
-account for the sampling uncertainty in our Monte-Carlo estimate of the
-selection integral.
+The term involving $\mu$ would appear in an analysis that ignores the rate $R$
+and works entirely with population \emph{distributions} rather than \emph{number
+densities} \citep{Mandel2018,Fishbach2018}; the term involving $\Neff$ is a
+correction to account for the sampling uncertainty in our Monte-Carlo estimate
+of the selection integral.
 
-While the term in Eq.\ \eqref{eq:fully-marginalized-posterior} involving $\Neff$
-might at first seem troubling (as it is $\mathcal{O} \left( \Nobs^2 / \Neff
-\right)$, and therefore will not be negligable until $\Neff \gg \Nobs^2$,
-requiring a number of Monte-Carlo samples in the selection integral that grows
-faster than linearly with the number of observations fit), only
-\emph{differences} in log-posterior matter for inferences.  The $R$-dependent
-terms contribute to such differences through
+The uncertainty in parameters is driven by the \emph{differences} in the
+log-posterior.  The $R$-dependent terms contribute to such differences through
 %
 \begin{equation}
   \label{eq:pi-accuracy}
-  \Delta \log \pi = \ldots + \left( \Nobs \frac{\partial \mu}{\partial \tilde{\lambda}} - \frac{\Nobs^2}{2 \Neff} \frac{\partial \log \Neff}{\partial \tilde{\lambda}} \right) \Delta \tilde{\lambda}.
+  \Delta \log \pi = \ldots - \Nobs \left( \frac{\partial \log \mu}{\partial \tilde{\lambda}} - \frac{\Nobs}{2 \Neff} \frac{\partial \log \Neff}{\partial \tilde{\lambda}} \right) \Delta \tilde{\lambda}.
 \end{equation}
 %
 Both derivatives are independent of $\Neff$, so the relative contribution of the
 second term to the parameter estimates is $\mathcal{O}\left( \Nobs / \Neff
-\right)$.  Thus we conclude that we can limit the effect of uncertainties in the
-Monte-Carlo selection estimate on population inferences using a number of
-samples that grows linearly with the number of observations being fit.
+\right)$.
 
-The contribution of the two terms in Eq.\ \eqref{eq:pi-accuracy} can be
-straightforwardly tracked during, e.g., a MCMC stochastic sampling of the
-posterior by comparing the posterior standard deviation of $\Nobs \mu$ to that
-of $\Nobs^2/2\Neff$; if the latter is not sub-dominant, then more samples are
-necessary to estimate the selection integral for reliable parameter estimates
-(but remember that, at minimum, we require $\Neff > 4 \Nobs$ or our normal
-approximations to the posterior are invalid).
+$\Neff$ can be straightforwardly tracked during sampling of the posterior.  If
+$\Neff$ becomes close to $4 \Nobs$ then the posterior no longer peaks in $R$ and
+more injections must be obtained for an accurate analysis.
 
 If we wish to estimate the normalization $R$ in addition to the shape of the
-population distribution, then we can draw samples from the normal conditional
-distribution for $R$ with mean $\mu_R$ and standard deviation $\sigma_R$ at
-fixed $\tilde{\lambda}$ in post-processing after fitting for $\tilde{\lambda}$.
+population distribution, note that we can draw samples from the normal
+conditional distribution for $R$ with mean $\mu_R$ and standard deviation
+$\sigma_R$ at fixed $\tilde{\lambda}$ in post-processing.
+
+\acknowledgments
+
+A worked example, along with the \LaTeX{} source for this document, can be found
+at \url{https://github.com/farr/SelectionAccuracy}.
 
 \bibliography{selacc}
 
