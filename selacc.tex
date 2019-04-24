@@ -25,12 +25,11 @@
 \maketitle
 
 When conducting a population analysis on a catalog of objects the effect of the
-selection function---the choice of which observations produce objects that
-appear in the catalog and which do not---must be incorporated to avoid so-called
-``Malmquist bias'' \citep{Malmquist1922,Loredo2004,Mandel2018}. Suppose we have
-a catalog consisting of measurements (data) $d_i$, $i = 1, \ldots, \Nobs$, that
-constrain the parameters $\theta_i$ of a set of $\Nobs$ objects.  We wish infer
-the population distribution function
+selection function must be incorporated to avoid so-called ``Malmquist bias''
+\citep{Malmquist1922,Loredo2004,Mandel2018}. Suppose we have a catalog
+consisting of data $d_i$, $i = 1, \ldots, \Nobs$, that constrain the parameters
+$\theta_i$ of a set of $\Nobs$ objects.  We wish infer the population
+distribution function
 %
 \begin{equation}
   \diff{N}{\theta}\left( \lambda \right),
@@ -38,38 +37,33 @@ the population distribution function
 %
 which can depend on some population-level parameters $\lambda$.  The joint
 posterior for the object-level parameters $\theta_i$ and population-level
-parameters takes the form \citep{Loredo2004,Mandel2018}
+parameters is \citep{Loredo2004,Mandel2018}
 %
 \begin{equation}
   \label{eq:posterior}
 \pi \propto \prod_{i=1}^{\Nobs} \left[ p\left( d_i \mid \theta_i \right) \diff{N}{\theta_i}\left( \lambda \right) \right] \exp\left[ - \Lambda\left( \lambda \right) \right] p\left( \lambda \right).
 \end{equation}
 %
-Here $p\left( d \mid \theta\right)$ is the likelihood function that describes
-the measurement process for the catalog, $p\left( \lambda \right)$ is a prior on
-the population-level parameters, and $\Lambda$ is the expected number of
-detections given the measurement process and selection effects, the latter
-depending only on the observed data for each object:
+$p\left( d \mid \theta\right)$ is the likelihood function that describes the
+measurement process for the catalog, $p\left( \lambda \right)$ is a prior, and
+$\Lambda$ is the expected number of detections:
 %
 \begin{equation}
   \label{eq:selection-integral-unnorm}
   \Lambda\left( \lambda \right) \equiv \int_{\left\{ d \mid f(d) > 0 \right\}} \dd d \, \dd \theta \, \diff{N}{\theta}\left( \lambda \right) p\left( d \mid \theta \right).
 \end{equation}
 %
-The selection function is described by $f$; an observation will be included in
-the catalog if and only if it generates data such that $f(d) > 0$.  It will be
-convenient to factor an overall normalization out of the population distribution
-so that
+$f$ represents the selection function; an observation will be included in the
+catalog if and only if it generates data such that $f(d) > 0$.  We factor an
+overall normalization out of the population distribution so that
 %
 \begin{equation}
   \diff{N}{\theta}\left( \lambda \right) = R \xi\left( \theta \mid \tilde{\lambda} \right),
 \end{equation}
 %
-with the amplitude of $\xi$ fixed in some way (perhaps by demanding that $\xi$
-integrate to one over all $\theta$, or fixing its value at a fiducial set of
-parameters); $\tilde{\lambda}$ is the set of parameters that remain once the
-amplitude of the population distribution is fixed.  In this re-parameterization,
-$\Lambda = R x$, where $x$ is given by
+with the amplitude of $\xi$ fixed in some way; $\tilde{\lambda}$ is the set of
+parameters that remain once the amplitude of the population distribution is
+fixed.  In this re-parameterization, $\Lambda = R x$, where $x$ is given by
 %
 \begin{equation}
   \label{eq:selection-integral}
@@ -80,23 +74,20 @@ If $\xi$ integrates to one over all $\theta$, then $x$ is the \emph{fraction} of
 sources from a population described by $\tilde{\lambda}$ that are detectable.
 
 In simple cases the integral in Eq.\ \eqref{eq:selection-integral} can be
-evaluated analytically.  In other cases it is not possible to evaluate the
-integral analytically, but $f$ is a simple enough function to permit evaluation
-of the integral stochastically in the process of sampling from $\pi$
-\citep{Mandel2018}.  But for most realistic applications it is not even possible
+evaluated analytically.  But for most realistic applications it is not possible
 to analytically evaluate $f$ \citep[see
 e.g.][]{Burke2015,Christainsen2015,GW150914-Rate,GW150914-Rate-Supplement,Burke2017}.
-Instead, the detection efficiency must be \emph{simulated} by drawing synthetic
-objects from a fiducial distribution, $\pdraw\left( \theta \right)$, drawing
+Instead, the detection efficiency must be estimated by drawing synthetic objects
+from a fiducial distribution, $\pdraw\left( \theta \right)$, drawing
 corresponding data from the likelihood function $p\left( d \mid \theta \right)$,
 and ``injecting'' these data into the pipeline used to produce the catalog,
-recording which observations are detected \citep{Tiwari2018}.  This Monte-Carlo
-procedure introduces uncertainty in the estimation of the selection integral; we
-must have enough draws that this uncertainty does not alter the shape of the
-posterior $\pi$ very much.
+recording which observations are detected \citep{Tiwari2018}.  This procedure
+introduces uncertainty in the estimation of the selection integral; we must have
+enough draws that this uncertainty does not alter the shape of the posterior
+$\pi$ very much.
 
 Given a set of detected objects with parameters $\theta_j$, $j = 1, \ldots,
-\Ndet$, generated from a total number of draws $\Ndraw$ the integral in Eq.\
+\Ndet$ generated from a total number of draws $\Ndraw$ the integral in Eq.\
 \eqref{eq:selection-integral} can be estimated via
 %
 \begin{equation}
@@ -119,24 +110,21 @@ with
 and
 %
 \begin{equation}
-    \sigma^2 \equiv \frac{\mu^2}{\Neff} \simeq \frac{1}{\Ndraw^2} \sum_{i=1}^{\Ndet} \left[ \frac{\xi\left( \theta_j \mid \tilde{\lambda} \right)}{\pdraw\left( \theta_j \right)} \right]^2 - \frac{\mu^2}{\Ndraw},
+    \sigma^2 \equiv \frac{\mu^2}{\Neff} \simeq \frac{1}{\Ndraw^2} \sum_{i=1}^{\Ndet} \left[ \frac{\xi\left( \theta_j \mid \tilde{\lambda} \right)}{\pdraw\left( \theta_j \right)} \right]^2 - \frac{\mu^2}{\Ndraw}.
 \end{equation}
 %
-where we have introduced the parameter $\Neff$ that gives the \emph{effective}
-number of independent samples (draws) that contribute to the Monte-Carlo
-estimate of $x$.
+We have introduced the parameter $\Neff$ that gives the \emph{effective} number
+of independent draws that contribute to the estimate of $x$.
 
 Given a particular sampling of the selection function, we should marginalize
-over the uncertainty in $x$ in our posterior.  Eq.\ \eqref{eq:posterior} becomes
+over the uncertainty in $x$.  Eq.\ \eqref{eq:posterior} becomes
 %
 \begin{equation}
   \label{eq:posterior-integrated}
     \pi \propto \prod_{i = 1}^{\Nobs} \left[ p\left( d_i \mid \theta_i \right) \xi\left( \theta_i \mid \tilde{\lambda} \right) \right] \int \dd x \, R^{\Nobs} \exp\left[ -R x \right] N\left( x \mid \mu, \sigma\right).
 \end{equation}
 %
-Performing the integral and assuming that the $\Neff$ is large enough that the
-support of the normal distribution for $x<0$ is negligible so that we can
-integrate over $-\infty < x < \infty$, we obtain
+Integrating over $-\infty < x < \infty$, we obtain
 %
 \begin{equation}
   \label{eq:approx-marginal-x-posterior}
@@ -144,9 +132,8 @@ integrate over $-\infty < x < \infty$, we obtain
 \end{equation}
 %
 The divergence of this expression as $R\to \infty$ reflects that the normal
-approximation to the sampling distribution of $x$ at finite $\Neff$ permits
-non-zero probability of $x < 0$, while the true distribution requires $x > 0$.
-Eq.\ \eqref{eq:approx-marginal-x-posterior} has stationary points in $R$ at
+approximation permits non-zero probability of $x < 0$. Eq.\
+\eqref{eq:approx-marginal-x-posterior} has stationary points in $R$ at
 %
 \begin{equation}
   R = R_{\pm} = \frac{\Neff \pm \sqrt{\Neff \left( \Neff - 4 \Nobs \right)}}{2 \mu}.
@@ -161,10 +148,9 @@ divergent behavior as $R\to \infty$.  We have
   R_{-} = \frac{\Nobs}{\mu} \left( 1 + \frac{\Nobs}{\Neff} + 2 \left( \frac{\Nobs}{\Neff} \right)^2 + \mathcal{O}\left( \frac{\Nobs}{\Neff} \right)^3 \right).
 \end{equation}
 %
-Note that $R = \Nobs / \mu$ is the point estimate for the detection efficiency
-in Eq.\ \eqref{eq:simple-monte-carlo-estimate}.  Near $R = R_{-}$ a normal
-approximation holds for the posterior as a function of $R$ with $\mu_R = R_{-}$
-and
+$R = \Nobs / \mu$ is the point estimate for the detection efficiency in Eq.\
+\eqref{eq:simple-monte-carlo-estimate}.  Near $R = R_{-}$ a normal approximation
+holds for the posterior as a function of $R$ with $\mu_R = R_{-}$ and
 %
 \begin{equation}
   \sigma_R = \frac{\sqrt{\Nobs}}{\mu} \left( 1 + \frac{3}{2} \frac{\Nobs}{\Neff} + \frac{31}{8} \left( \frac{\Nobs}{\Neff} \right)^2 + \mathcal{O} \left( \frac{\Nobs}{\Neff} \right)^3 \right).
@@ -179,10 +165,9 @@ gives
 \end{equation}
 %
 The term involving $\mu$ would appear in an analysis that ignores the rate $R$
-and works entirely with population \emph{distributions} rather than \emph{number
-densities} \citep{Mandel2018,Fishbach2018}; the term involving $\Neff$ is a
-correction to account for the sampling uncertainty in our Monte-Carlo estimate
-of the selection integral.
+and works entirely with population distributions
+\citep{Mandel2018,Fishbach2018}; the term involving $\Neff$ is a correction to
+account for the uncertainty in our estimate of the selection integral.
 
 The uncertainty in parameters is driven by the \emph{differences} in the
 log-posterior.  The $R$-dependent terms contribute to such differences through
@@ -196,14 +181,9 @@ Both derivatives are independent of $\Neff$, so the relative contribution of the
 second term to the parameter estimates is $\mathcal{O}\left( \Nobs / \Neff
 \right)$.
 
-$\Neff$ can be straightforwardly tracked during sampling of the posterior.  If
-$\Neff$ becomes close to $4 \Nobs$ then the posterior no longer peaks in $R$ and
-more injections must be obtained for an accurate analysis.
-
-If we wish to estimate the normalization $R$ in addition to the shape of the
-population distribution, note that we can draw samples from the normal
-conditional distribution for $R$ with mean $\mu_R$ and standard deviation
-$\sigma_R$ at fixed $\tilde{\lambda}$ in post-processing.
+If $\Neff$ becomes close to $4 \Nobs$ for any relevant set of population
+parameters then the posterior no longer peaks in $R$ and more injections must be
+obtained for an accurate analysis.
 
 \acknowledgments
 
